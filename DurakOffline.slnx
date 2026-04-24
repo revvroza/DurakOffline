@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="DurakOffline/DurakOffline.csproj" />
+  <Project Path="UI/UI.csproj" Id="de349928-3293-4b82-ac8e-d86c2fd4a957" />
+  <Project Path="UnitTests/UnitTests.csproj" />
+</Solution>
