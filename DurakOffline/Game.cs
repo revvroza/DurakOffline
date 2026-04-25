@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace DurakOffline
 {
+    /// <summary>
+    /// Основной класс игры "Дурак", управляющий всей логикой игрового процесса
+    /// </summary>
     public class Game
     {
         private Deck _deck;
@@ -30,6 +33,11 @@ namespace DurakOffline
         public List<Card> GetAttackingCards() => _attackingCards.ToList();
         public List<Card> GetDefendingCards() => _defendingCards.ToList();
 
+        /// <summary>
+        /// Конструктор игры
+        /// </summary>
+        /// <param name="player1Name">Имя первого игрока</param>
+        /// <param name="player2Name">Имя второго игрока</param>
         public Game(string player1Name, string player2Name)
         {
             _deck = new Deck();
@@ -44,6 +52,9 @@ namespace DurakOffline
             Winner = null;
         }
 
+        /// <summary>
+        /// Начало игры: перемешивание колоды, открытие козыря, раздача по 6 карт
+        /// </summary>
         public void StartGame()
         {
             _deck.Shuffle();
@@ -53,6 +64,11 @@ namespace DurakOffline
             _player2.TakeCards(_deck.DealCards(6));
         }
 
+        /// <summary>
+        /// Атака/подкидывание карты текущим атакующим
+        /// </summary>
+        /// <param name="card">Карта для атаки/подкидывания</param>
+        /// <returns>True, если атака успешна, иначе False</returns>
         public bool Attack(Card card)
         {
             if (_isGameOver) return false;
@@ -85,6 +101,13 @@ namespace DurakOffline
 
             return true;
         }
+
+        /// <summary>
+        /// Защита: попытка побить атакующую карту
+        /// </summary>
+        /// <param name="attackingCard">Атакующая карта</param>
+        /// <param name="defendingCard">Карта для защиты</param>
+        /// <returns>True, если защита успешна, иначе False</returns>
         public bool Defend(Card attackingCard, Card defendingCard)
         {
             if (_isGameOver) return false;
@@ -104,6 +127,9 @@ namespace DurakOffline
             return true;
         }
 
+        /// <summary>
+        /// Защитник забирает все карты со стола (не смог отбиться)
+        /// </summary>
         public void TakeCards()
         {
             if (_isGameOver) return;
@@ -133,6 +159,10 @@ namespace DurakOffline
             }
         }
 
+        /// <summary>
+        /// Проверка, завершён ли текущий раунд (все атаки отбиты)
+        /// </summary>
+        /// <returns>True, если раунд завершён, иначе False</returns>
         public bool IsRoundComplete()
         {
             return _attackingCards.Count > 0 && _attackingCards.Count == _defendingCards.Count;
@@ -181,7 +211,6 @@ namespace DurakOffline
             int player1Cards = _player1.CardCount;
             int player2Cards = _player2.CardCount;
 
-            System.Diagnostics.Debug.WriteLine($"=== CheckGameOver ===");
             System.Diagnostics.Debug.WriteLine($"Игрок 1 карт: {player1Cards}");
             System.Diagnostics.Debug.WriteLine($"Игрок 2 карт: {player2Cards}");
 
@@ -204,6 +233,10 @@ namespace DurakOffline
             }
         }
 
+        /// <summary>
+        /// Получение строкового состояния игры
+        /// </summary>
+        /// <returns>Строка с информацией о козыре, ходе, количестве карт</returns>
         public string GetGameState()
         {
             return $"Козырь: {_deck.TrumpCard}\n" +
@@ -234,9 +267,9 @@ namespace DurakOffline
             int loserCards = Winner == _player1 ? _player2.CardCount : _player1.CardCount;
 
             if (loserCards == 0)
-                return $"🏆 ПОБЕДИТЕЛЬ: {winnerName}! 🏆\nПоздравляем!";
+                return $"ПОБЕДИТЕЛЬ: {winnerName}! \nПоздравляем!";
             else
-                return $"🏆 ПОБЕДИТЕЛЬ: {winnerName}! 🏆\nУ проигравшего осталось {loserCards} карт";
+                return $"ПОБЕДИТЕЛЬ: {winnerName}! \nУ проигравшего осталось {loserCards} карт";
         }
 
         public bool CanAddMoreCards()

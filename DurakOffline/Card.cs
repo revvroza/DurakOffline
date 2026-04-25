@@ -4,12 +4,31 @@ using System.Text;
 
 namespace DurakOffline
 {
+    /// <summary>
+    /// Класс, представляющий игральную карту
+    /// </summary>
     public class Card
     {
+        /// <summary>
+        /// Масть карты (Черви, Буби, Крести, Пики)
+        /// </summary>
         public Suit Suit { get; }
+
+        /// <summary>
+        /// Достоинство карты (6,7,8,9,10,В,Д,К,Т)
+        /// </summary>
         public Rank Rank { get; }
+
+        /// <summary>
+        /// Флаг, указывающий, является ли карта козырем
+        /// </summary>
         public bool IsTrump { get; set; }
 
+        /// <summary>
+        /// Конструктор карты
+        /// </summary>
+        /// <param name="suit">Масть карты</param>
+        /// <param name="rank">Достоинство карты</param>
         public Card(Suit suit, Rank rank)
         {
             Suit = suit;
@@ -17,6 +36,12 @@ namespace DurakOffline
             IsTrump = false;
         }
 
+        /// <summary>
+        /// Определяет, может ли текущая карта побить атакующую карту
+        /// </summary>
+        /// <param name="attackingCard">Атакующая карта, которую нужно побить</param>
+        /// <param name="trumpCard">Карта-козырь (определяет козырную масть)</param>
+        /// <returns>True, если текущая карта может побить атакующую, иначе False</returns>
         public bool CanBeat(Card attackingCard, Card trumpCard)
         {
             if (attackingCard == null)
@@ -47,6 +72,10 @@ namespace DurakOffline
             }
         }
 
+        /// <summary>
+        /// Возвращает строковое представление карты
+        /// </summary>
+        /// <returns>Строка вида "6♥", "В♠"
         public override string ToString()
         {
             string suitSymbol = Suit switch
