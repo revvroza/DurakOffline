@@ -13,6 +13,9 @@ namespace UI
         private bool _isPlayer1HandVisible;
         private bool _isPlayer2HandVisible;
 
+        //Новое.Хранит карты для множественной атаки
+        private List<Card> _selectedCards = new List<Card>();
+
         public Form1()
         {
             InitializeComponent();
@@ -28,12 +31,14 @@ namespace UI
             btnPlayer2Open.Enabled = false;
             btnTakeCards.Enabled = false;
             btnEndTurn.Enabled = false;
+            btnMultiAttack.Enabled = false;
 
             btnNewGame.Click += BtnStartGame_Click;
             btnPlayer1Open.Click += (s, e) => TogglePlayerCards(1);
             btnPlayer2Open.Click += (s, e) => TogglePlayerCards(2);
             btnTakeCards.Click += BtnTakeCards_Click;
             btnEndTurn.Click += BtnEndTurn_Click;
+            btnMultiAttack.Click += BtnMultiAttack_Click;
         }
 
         private void BtnStartGame_Click(object sender, EventArgs e)
@@ -118,6 +123,7 @@ namespace UI
             }
         }
 
+        //Переработано.Добавлена множественная атака
         private void DisplayPlayerCards(List<Card> hand, int player)
         {
             var availableRanks = _game.GetAvailableRanksToAdd();
@@ -125,6 +131,10 @@ namespace UI
                                  _game.GetAttackingCards().Count == _game.GetDefendingCards().Count();
 
             panelPlayerHand.Controls.Clear();
+            _selectedCards.Clear();
+            btnMultiAttack.Enabled = false;
+
+            bool canMultiSelect = _game.GetAttackingCards().Count == 0;
 
             foreach (var card in hand)
             {
@@ -135,14 +145,34 @@ namespace UI
                 }
 
                 var cardControl = new CardControl(card, canPlay);
+
                 if (canPlay)
                 {
-                    cardControl.CardClicked += (s, c) => OnCardSelected(c);
+                    if (canMultiSelect)
+                    {
+                        cardControl.CardClicked += (s, c) => ToggleCardSelection(c);
+                        cardControl.BackColor = Color.LightGreen;
+                    }
+                    else
+                    {
+                        cardControl.CardClicked += (s, c) => OnCardSelected(c);
+                        cardControl.BackColor = Color.LightGreen;
+                    }
                 }
+                else
+                {
+                    cardControl.BackColor = Color.LightGray;
+                }
+
                 panelPlayerHand.Controls.Add(cardControl);
             }
 
             panelPlayerHand.Visible = true;
+
+            if (canMultiSelect && hand.Count > 0)
+            {
+                ShowMessage("Выберите карты одного достоинства, затем нажмите 'Атака'");
+            }
 
             if (isAddingPhase && _game.GetAttackingCards().Count > 0)
             {
@@ -161,6 +191,8 @@ namespace UI
             btnPlayer1Open.BackColor = Color.Green;
             btnPlayer2Open.Text = "Игрок2: Открыть";
             btnPlayer2Open.BackColor = Color.Green;
+            btnMultiAttack.Enabled = false;
+            _selectedCards.Clear();
             ShowMessage("Передайте ход другому игроку. Нажмите 'Открыть' когда будет ваш ход");
         }
 
@@ -394,6 +426,68 @@ namespace UI
             if (result == DialogResult.Yes)
             {
                 Application.Exit(); 
+            }
+        }
+
+        //Новое. Выбор нескольких карт одного достоинства для атаки
+        private void ToggleCardSelection(Card card)
+        {
+            if (_selectedCards.Contains(card))
+            {
+                _selectedCards.Remove(card);
+                ShowMessage($"Карта {card} отменена. Выбрано: {_selectedCards.Count}");
+            }
+            else
+            {
+                if (_selectedCards.Count > 0 && _selectedCards[0].Rank != card.Rank)
+                {
+                    ShowMessage("Можно выбирать только карты одного достоинства!");
+                    return;
+                }
+
+                _selectedCards.Add(card);
+                ShowMessage($"Карта {card} выбрана. Выбрано: {_selectedCards.Count}");
+            }
+
+            btnMultiAttack.Enabled = _selectedCards.Count > 0;
+        }
+
+        //Новая кнопка для атаки        
+        private void BtnMultiAttack_Click(object sender, EventArgs e)
+        {
+            if (_game == null || _selectedCards.Count == 0) return;
+
+            bool success = true;
+            foreach (var card in _selectedCards)
+            {
+                if (!_game.Attack(card))
+                {
+                    success = false;
+                    break;
+                }
+            }
+
+            if (success)
+            {
+                UpdateUI();
+                UpdateTableDisplay();
+                ShowMessage($"Атака {_selectedCards.Count} картами!");
+
+                _selectedCards.Clear();
+                btnMultiAttack.Enabled = false;
+                _isPlayer1HandVisible = false;
+                _isPlayer2HandVisible = false;
+                panelPlayerHand.Visible = false;
+                btnPlayer1Open.Text = "Игрок1: Открыть";
+                btnPlayer1Open.BackColor = Color.Green;
+                btnPlayer2Open.Text = "Игрок2: Открыть";
+                btnPlayer2Open.BackColor = Color.Green;
+            }
+            else
+            {
+                ShowMessage("Не удалось атаковать выбранными картами!");
+                _selectedCards.Clear();
+                btnMultiAttack.Enabled = false;
             }
         }
     }

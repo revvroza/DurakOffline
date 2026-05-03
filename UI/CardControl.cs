@@ -21,10 +21,9 @@ namespace UI
             _isClickable = isClickable;
             this.Size = new Size(80, 110);
             this.BackColor = Color.White;
-            this.BorderStyle = BorderStyle.None; // Убираем стандартную обводку
+            this.BorderStyle = BorderStyle.None; 
             this.Cursor = isClickable ? Cursors.Hand : Cursors.Default;
 
-            // Добавляем тень
             this.Padding = new Padding(2);
 
             if (isClickable)
