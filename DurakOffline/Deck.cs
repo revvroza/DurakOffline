@@ -69,8 +69,12 @@ namespace DurakOffline
             if (_cards.Count == 0)
                 throw new InvalidOperationException("Колода пуста");
 
-            TrumpCard = _cards[_cards.Count - 1];
+            int randomIndex = _random.Next(_cards.Count);
+            TrumpCard = _cards[randomIndex];
             TrumpCard.IsTrump = true;
+
+            _cards.RemoveAt(randomIndex);
+            _cards.Add(TrumpCard);
         }
 
         /// <summary>
@@ -87,8 +91,8 @@ namespace DurakOffline
             var cards = new List<Card>();
             for (int i = 0; i < count; i++)
             {
-                cards.Add(_cards[_cards.Count - 1]);
-                _cards.RemoveAt(_cards.Count - 1);
+                cards.Add(_cards[0]); 
+                _cards.RemoveAt(0);
             }
             return cards;
         }
