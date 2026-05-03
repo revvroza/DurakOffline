@@ -48,7 +48,6 @@ namespace UI
             int cardWidth = Width - 2;
             int cardHeight = Height - 2;
 
-            // Рисуем тень
             Rectangle shadowRect = new Rectangle(2, 2, cardWidth, cardHeight);
             using (GraphicsPath shadowPath = GetRoundedRectangle(shadowRect, 10))
             {
@@ -58,33 +57,27 @@ namespace UI
                 }
             }
 
-            // Рисуем саму карту
             Rectangle cardRect = new Rectangle(0, 0, cardWidth, cardHeight);
             using (GraphicsPath cardPath = GetRoundedRectangle(cardRect, 10))
             {
-                // Заливка фона
                 using (SolidBrush bgBrush = new SolidBrush(_isClickable ? Color.LightGreen : Color.White))
                 {
                     g.FillPath(bgBrush, cardPath);
                 }
 
-                // Белая обводка толщиной 2px
                 using (Pen outlinePen = new Pen(Color.White, 2))
                 {
                     g.DrawPath(outlinePen, cardPath);
                 }
 
-                // Черная внешняя обводка (для отделения от стола)
                 using (Pen borderPen = new Pen(Color.Black, 1.5f))
                 {
                     g.DrawPath(borderPen, cardPath);
                 }
             }
 
-            // Определяем цвет масти
             Color suitColor = (_card.Suit == Suit.Hearts || _card.Suit == Suit.Diamonds) ? Color.Red : Color.Black;
 
-            // Получаем символ масти
             string suitSymbol = _card.Suit switch
             {
                 Suit.Hearts => "♥",
@@ -94,7 +87,6 @@ namespace UI
                 _ => ""
             };
 
-            // Получаем значение карты
             string rankStr = _card.Rank switch
             {
                 Rank.Six => "6",
@@ -109,14 +101,12 @@ namespace UI
                 _ => ""
             };
 
-            // Рисуем верхний левый угол
             using (Brush brush = new SolidBrush(suitColor))
             {
                 g.DrawString(rankStr, _rankFont, brush, 5, 5);
                 g.DrawString(suitSymbol, _smallFont, brush, 5, 28);
             }
 
-            // Рисуем центр (большой символ масти)
             using (Font bigFont = new Font("Arial", 36, FontStyle.Bold))
             using (Brush brush = new SolidBrush(suitColor))
             {
@@ -126,7 +116,6 @@ namespace UI
                 g.DrawString(suitSymbol, bigFont, brush, x, y);
             }
 
-            // Рисуем нижний правый угол (перевернутый)
             using (Brush brush = new SolidBrush(suitColor))
             {
                 g.TranslateTransform(Width - 5, Height - 5);
